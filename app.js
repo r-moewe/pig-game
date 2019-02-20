@@ -9,20 +9,12 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer;
+var scores, roundScore, activePlayer, gamePlaying;
 
-scores = [0, 0];
-roundScore = 0;
-activePlayer = 0;
+init();
 
 saikoro = Math.floor(Math.random() * 6);
 
-document.querySelector('.dice').style.display = 'none';
-
-document.getElementById('score-0').innerHTML = 0;
-document.getElementById('current-0').innerHTML = 0;
-document.getElementById('score-1').innerHTML = 0;
-document.getElementById('current-1').innerHTML = 0;
 
 
 //Roll Dice
@@ -30,43 +22,116 @@ const btnRoll = document.querySelector('.btn-roll');
 
 //無名関数（再利用できない
 btnRoll.addEventListener('click', function () {
+    if (gamePlaying) {
 
-    //random number
-    var saikoro = Math.floor(Math.random() * 6) + 1;
 
-    //display dice
-    var diceDOM = document.querySelector('.dice');
-    diceDOM.style.display = 'block';
-    diceDOM.src = "dice-" + saikoro + ".png";
+        //random number
+        var saikoro = Math.floor(Math.random() * 6) + 1;
 
-    //１じゃなければ現在の点数アップデート
-    if (saikoro !== 1) {
-        roundScore += saikoro;
-        document.getElementById('current-' + activePlayer).textContent = roundScore;
-    } else {
-        //Next Player（１が出た時の処理）
+        //display dice
+        var diceDOM = document.querySelector('.dice');
+        diceDOM.style.display = 'block';
+        diceDOM.src = "dice-" + saikoro + ".png";
 
-        //Round Scoreをリセット
+        //１じゃなければ現在の点数アップデート
+        if (saikoro !== 1) {
+            roundScore += saikoro;
+            document.getElementById('current-' + activePlayer).textContent = roundScore;
+        } else {
+            //Next Player（１が出た時の処理）
+
+            //Round Scoreをリセット
+            roundScore = 0;
+            document.getElementById('current-' + activePlayer).textContent = roundScore;
+
+            //下記の式と同じ
+            // if (activePlayer === 0) {
+            //     activePlayer = 1;
+            // } else {
+            //     activePlayer = 0;
+            // }
+
+            //Active Player Change
+            changePlayer();
+        }
+    }
+});
+
+/*
+*HOLD
+*/
+
+const holdBtn = document.querySelector('.btn-hold');
+holdBtn.addEventListener('click', function () {
+
+    if (gamePlaying) {
+
+        //現在のスコアをグローバルスコアに加える
+        scores[activePlayer] += roundScore;
         roundScore = 0;
+
+        //UI更新
+        document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
         document.getElementById('current-' + activePlayer).textContent = roundScore;
 
-        //三項演算子（もしactivePlayer===0なら？should be 1 /else:should be 0
-        activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
+        //プレイヤーがゲームクリアかどうかチェック
 
-        //下記の式と同じ
-        // if (activePlayer === 0) {
-        //     activePlayer = 1;
-        // } else {
-        //     activePlayer = 0;
-        // }
-
-        //Active Player Change
-        document.querySelector('.player-0-panel').classList.toggle('active');
-        document.querySelector('.player-1-panel').classList.toggle('active');
-
-        document.querySelector('.dice').style.display = 'none';
-
-
+        if (scores[activePlayer] >= 20) {
+            document.querySelector('#name-' + activePlayer).textContent = "Winner!";
+            document.querySelector('.dice').style.display = 'none';
+            document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+            document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+            gamePlaying = false;
+        } else {
+            changePlayer();
+        }
     }
 
 });
+
+
+function changePlayer() {
+    activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
+
+    document.querySelector('.player-0-panel').classList.toggle('active');
+    document.querySelector('.player-1-panel').classList.toggle('active');
+    document.querySelector('.dice').style.display = 'none';
+
+}
+
+//New Game
+document.querySelector('.btn-new').addEventListener('click', init);
+
+
+function init() {
+    scores = [0, 0];
+    activePlayer = 0;
+    roundScore = 0;
+
+    //状態変数
+
+    gamePlaying = true;
+
+    document.querySelector('.dice').style.display = 'none';
+
+    document.getElementById('score-0').innerHTML = 0;
+    document.getElementById('current-0').innerHTML = 0;
+    document.getElementById('score-1').innerHTML = 0;
+    document.getElementById('current-1').innerHTML = 0;
+    document.querySelector('#name-0').textContent = 'Player 1';
+    document.querySelector('#name-1').textContent = 'Player 2';
+    document.querySelector('.player-0-panel').classList.remove('winner');
+    document.querySelector('.player-1-panel').classList.remove('winner');
+
+    //activeクラスを全て削除後、プレイヤー１にactiveクラス付与
+    document.querySelector('.player-0-panel').classList.remove('active');
+    document.querySelector('.player-1-panel').classList.remove('active');
+    document.querySelector('.player-0-panel').classList.add('active');
+
+
+
+}
+
+
+
+
