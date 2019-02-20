@@ -9,32 +9,39 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer, gamePlaying;
+var scores, roundScore, activePlayer, gamePlaying, check6;
 
 init();
 
-saikoro = Math.floor(Math.random() * 6);
+/*
+*Roll Dice
+ */
 
-
-
-//Roll Dice
 const btnRoll = document.querySelector('.btn-roll');
-
-//無名関数（再利用できない
 btnRoll.addEventListener('click', function () {
     if (gamePlaying) {
 
-
         //random number
         var saikoro = Math.floor(Math.random() * 6) + 1;
+        var saikoro2 = Math.floor(Math.random() * 6) + 1;
 
-        //display dice
+        //display dice1
         var diceDOM = document.querySelector('.dice');
         diceDOM.style.display = 'block';
         diceDOM.src = "dice-" + saikoro + ".png";
 
+        //display dice2
+        var diceDOM = document.querySelector('.dice2');
+        diceDOM.style.display = 'block';
+        diceDOM.src = "dice-" + saikoro2 + ".png";
+
+
         //１じゃなければ現在の点数アップデート
-        if (saikoro !== 1) {
+        if (check6 === 6 && saikoro === 6) {
+            scores[activePlayer] = 0;
+            document.getElementById('score-' + activePlayer).textContent = '0';
+            changePlayer();
+        } else if (saikoro !== 1) {
             roundScore += saikoro;
             document.getElementById('current-' + activePlayer).textContent = roundScore;
         } else {
@@ -54,6 +61,8 @@ btnRoll.addEventListener('click', function () {
             //Active Player Change
             changePlayer();
         }
+        check6 = saikoro;
+
     }
 });
 
@@ -74,9 +83,20 @@ holdBtn.addEventListener('click', function () {
         document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
         document.getElementById('current-' + activePlayer).textContent = roundScore;
 
+        //input the goal score
+        var inputScore = document.querySelector('.input-score').value;
+        var goalScore;
+
+        if (inputScore) {
+            goalScore = inputScore;
+        } else {
+            goalScore = 100;
+        }
+
+
         //プレイヤーがゲームクリアかどうかチェック
 
-        if (scores[activePlayer] >= 20) {
+        if (scores[activePlayer] >= goalScore) {
             document.querySelector('#name-' + activePlayer).textContent = "Winner!";
             document.querySelector('.dice').style.display = 'none';
             document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
@@ -86,7 +106,6 @@ holdBtn.addEventListener('click', function () {
             changePlayer();
         }
     }
-
 });
 
 
@@ -96,6 +115,8 @@ function changePlayer() {
     document.querySelector('.player-0-panel').classList.toggle('active');
     document.querySelector('.player-1-panel').classList.toggle('active');
     document.querySelector('.dice').style.display = 'none';
+
+    check6 = 0;
 
 }
 
@@ -107,10 +128,10 @@ function init() {
     scores = [0, 0];
     activePlayer = 0;
     roundScore = 0;
-
     //状態変数
 
     gamePlaying = true;
+    check6 = 0;
 
     document.querySelector('.dice').style.display = 'none';
 
