@@ -37,12 +37,12 @@ btnRoll.addEventListener('click', function () {
 
 
         //１じゃなければ現在の点数アップデート
-        if (check6 === 6 && saikoro === 6) {
+        if ((check6 === 6 && saikoro === 6) || (check6 === 6 && saikoro2 === 6)) {
             scores[activePlayer] = 0;
             document.getElementById('score-' + activePlayer).textContent = '0';
             changePlayer();
-        } else if (saikoro !== 1) {
-            roundScore += saikoro;
+        } else if (saikoro !== 1 && saikoro2 !== 1) {
+            roundScore += saikoro + saikoro2;
             document.getElementById('current-' + activePlayer).textContent = roundScore;
         } else {
             //Next Player（１が出た時の処理）
@@ -99,6 +99,7 @@ holdBtn.addEventListener('click', function () {
         if (scores[activePlayer] >= goalScore) {
             document.querySelector('#name-' + activePlayer).textContent = "Winner!";
             document.querySelector('.dice').style.display = 'none';
+            document.querySelector('.dice2').style.display = 'none';
             document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
             document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
             gamePlaying = false;
@@ -115,6 +116,7 @@ function changePlayer() {
     document.querySelector('.player-0-panel').classList.toggle('active');
     document.querySelector('.player-1-panel').classList.toggle('active');
     document.querySelector('.dice').style.display = 'none';
+    document.querySelector('.dice2').style.display = 'none';
 
     check6 = 0;
 
@@ -134,6 +136,7 @@ function init() {
     check6 = 0;
 
     document.querySelector('.dice').style.display = 'none';
+    document.querySelector('.dice2').style.display = 'none';
 
     document.getElementById('score-0').innerHTML = 0;
     document.getElementById('current-0').innerHTML = 0;
